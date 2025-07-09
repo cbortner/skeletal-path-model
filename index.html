@@ -23,10 +23,6 @@
     .node text {
       font-size: 14px;
     }
-    .leak-indicator {
-      fill: red;
-      font-size: 18px;
-    }
     .eq-box {
       margin-top: 20px;
       padding: 10px;
@@ -47,28 +43,53 @@
 
   <script>
     const nodes = [
-      { id: 0, label: "1" },
+      { id: 0, label: "1 (Input)" },
       { id: 1, label: "2" },
       { id: 2, label: "3" },
-      { id: 3, label: "4" },
+      { id: 3, label: "4 (Output)" },
     ];
 
     const links = [
-      { source: 0, target: 1 },
-      { source: 1, target: 2 },
-      { source: 2, target: 3 },
+      { source: 0, target: 1, label: "a_{01}" },
+      { source: 1, target: 2, label: "a_{12}" },
+      { source: 2, target: 3, label: "a_{23}" },
     ];
 
     let leakNode = 0; // Initial leak location
 
     const eqLookup = {
       0: "y^{(3)} + (a_{01}+a_{12}+a_{23}) y'' + (a_{01}a_{12}+a_{12}a_{23}) y' + a_{01}a_{12}a_{23} y = u",
-      1: "y^{(3)} + (a_{02}+a_{12}+a_{23}) y'' + (a_{02}a_{12}+a_{12}a_{23}) y' + a_{02}a_{12}a_{23} y = u",
-      2: "y^{(3)} + (a_{03}+a_{12}+a_{23}) y'' + (a_{03}a_{12}+a_{12}a_{23}) y' + a_{03}a_{12}a_{23} y = u",
+      1: "y^{(3)} + (a_{02}+a_{12}+a_{23}) y'' + (a_{02}a_{12}+a_{12}a_{23}) y' + a_{01}a_{12}a_{23} y = u",
+      2: "y^{(3)} + (a_{03}+a_{12}+a_{23}) y'' + (a_{03}a_{12}+a_{12}a_{23}) y' + a_{01}a_{12}a_{23} y = u",
       3: "\\text{No leak allowed in the output node.}"
     };
 
     const svg = d3.select("svg");
+
+    // Define arrowhead marker for links and leak
+    svg.append("defs").append("marker")
+      .attr("id", "link-arrow")
+      .attr("viewBox", "0 0 10 10")
+      .attr("refX", 10)
+      .attr("refY", 5)
+      .attr("markerWidth", 6)
+      .attr("markerHeight", 6)
+      .attr("orient", "auto")
+      .append("path")
+      .attr("d", "M 0 0 L 10 5 L 0 10 z")
+      .attr("fill", "gray");
+
+    svg.append("defs").append("marker")
+      .attr("id", "leak-arrow")
+      .attr("viewBox", "0 0 10 10")
+      .attr("refX", 10)
+      .attr("refY", 5)
+      .attr("markerWidth", 6)
+      .attr("markerHeight", 6)
+      .attr("orient", "auto")
+      .append("path")
+      .attr("d", "M 0 0 L 10 5 L 0 10 z")
+      .attr("fill", "red");
 
     const nodeGroup = svg.selectAll("g.node")
       .data(nodes)
@@ -99,71 +120,83 @@
       .attr("x1", d => 100 + d.source * 120)
       .attr("y1", 75)
       .attr("x2", d => 100 + d.target * 120)
-      .attr("y2", 75);
+      .attr("y2", 75)
+      .attr("marker-end", "url(#link-arrow)");
 
-// Draw input arrow to node 1
-svg.append("line")
-  .attr("x1", 40)
-  .attr("y1", 75)
-  .attr("x2", 75)
-  .attr("y2", 75)
-  .attr("stroke", "green")
-  .attr("stroke-width", 3)
-  .attr("marker-end", "url(#arrow)");
+    // Edge labels
+    svg.selectAll(".edge-label")
+      .data(links)
+      .enter()
+      .append("text")
+      .attr("class", "edge-label")
+      .attr("x", d => 100 + (d.source + 0.5) * 120)
+      .attr("y", 60)
+      .attr("text-anchor", "middle")
+      .text(d => d.label);
 
-svg.append("text")
-  .attr("x", 30)
-  .attr("y", 70)
-  .attr("text-anchor", "start")
-  .attr("fill", "green")
-  .text("in");
+    // Draw input arrow to node 1
+    svg.append("line")
+      .attr("x1", 40)
+      .attr("y1", 75)
+      .attr("x2", 75)
+      .attr("y2", 75)
+      .attr("stroke", "green")
+      .attr("stroke-width", 3)
+      .attr("marker-end", "url(#arrow)");
 
-// Define marker (arrowhead)
-svg.append("defs").append("marker")
-  .attr("id", "arrow")
-  .attr("viewBox", "0 0 10 10")
-  .attr("refX", 10)
-  .attr("refY", 5)
-  .attr("markerWidth", 6)
-  .attr("markerHeight", 6)
-  .attr("orient", "auto-start-reverse")
-  .append("path")
-  .attr("d", "M 0 0 L 10 5 L 0 10 z")
-  .attr("fill", "green");
+    svg.append("text")
+      .attr("x", 30)
+      .attr("y", 70)
+      .attr("text-anchor", "start")
+      .attr("fill", "green")
+      .text("in");
 
+    // Define marker for input arrow
+    svg.append("defs").append("marker")
+      .attr("id", "arrow")
+      .attr("viewBox", "0 0 10 10")
+      .attr("refX", 10)
+      .attr("refY", 5)
+      .attr("markerWidth", 6)
+      .attr("markerHeight", 6)
+      .attr("orient", "auto-start-reverse")
+      .append("path")
+      .attr("d", "M 0 0 L 10 5 L 0 10 z")
+      .attr("fill", "green");
 
-// Draw output line from node 4 with a circle
-svg.append("line")
-  .attr("x1", 100 + 3 * 120 + 25)  // right edge of node 4
-  .attr("y1", 75)
-  .attr("x2", 100 + 3 * 120 + 60)  // some distance to the right
-  .attr("y2", 75)
-  .attr("stroke", "purple")
-  .attr("stroke-width", 3);
+    // Draw output line with circle
+    svg.append("line")
+      .attr("x1", 100 + 3 * 120 + 25)
+      .attr("y1", 75)
+      .attr("x2", 100 + 3 * 120 + 60)
+      .attr("y2", 75)
+      .attr("stroke", "purple")
+      .attr("stroke-width", 3);
 
-svg.append("circle")
-  .attr("cx", 100 + 3 * 120 + 60)  // at end of line
-  .attr("cy", 75)
-  .attr("r", 5)
-  .attr("fill", "purple");
+    svg.append("circle")
+      .attr("cx", 100 + 3 * 120 + 60)
+      .attr("cy", 75)
+      .attr("r", 5)
+      .attr("fill", "purple");
 
-svg.append("text")
-  .attr("x", 100 + 3 * 120 + 70)
-  .attr("y", 70)
-  .attr("text-anchor", "start")
-  .attr("fill", "purple")
-  .text("out");
+    svg.append("text")
+      .attr("x", 100 + 3 * 120 + 70)
+      .attr("y", 70)
+      .attr("text-anchor", "start")
+      .attr("fill", "purple")
+      .text("out");
 
-
-
-    
     function drawLeak() {
-      svg.selectAll("text.leak-indicator").remove();
-      svg.append("text")
+      svg.selectAll("line.leak-indicator").remove();
+      svg.append("line")
         .attr("class", "leak-indicator")
-        .attr("x", 100 + leakNode * 120)
-        .attr("y", 40)
-        .text("\u2744"); // Snowflake icon as leak
+        .attr("x1", 100 + leakNode * 120)
+        .attr("y1", 100)
+        .attr("x2", 100 + leakNode * 120)
+        .attr("y2", 135)
+        .attr("stroke", "red")
+        .attr("stroke-width", 2)
+        .attr("marker-end", "url(#leak-arrow)");
     }
 
     function updateEquation() {
