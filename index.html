@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skeletal Path Model</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" />
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+    }
+    svg {
+      border: 1px solid #ccc;
+    }
+    .node circle {
+      fill: lightblue;
+      stroke: steelblue;
+      stroke-width: 2px;
+    }
+    .node text {
+      font-size: 14px;
+    }
+    .leak-indicator {
+      fill: red;
+      font-size: 18px;
+    }
+    .eq-box {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f4f4f4;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Skeletal Path Model</h2>
+  <p>Click a node to move the leak (output node cannot leak).</p>
+  <svg width="600" height="150"></svg>
+
+  <div class="eq-box">
+    <strong>Input-Output Equation:</strong>
+    <div id="equation"></div>
+  </div>
+
+  <script>
+    const nodes = [
+      { id: 0, label: "1 (Input)" },
+      { id: 1, label: "2" },
+      { id: 2, label: "3" },
+      { id: 3, label: "4 (Output)" },
+    ];
+
+    const links = [
+      { source: 0, target: 1 },
+      { source: 1, target: 2 },
+      { source: 2, target: 3 },
+    ];
+
+    let leakNode = 0; // Initial leak location
+
+    const eqLookup = {
+      0: "y^{(3)} + (a_{01}+a_{12}+a_{23}) y'' + (a_{01}a_{12}+a_{12}a_{23}) y' + a_{01}a_{12}a_{23} y = u",
+      1: "y^{(3)} + (a_{01}+a_{12}+a_{23}) y'' + (a_{01}a_{12}+a_{12}a_{23}) y' + a_{01}a_{12}a_{23} y = u",
+      2: "y^{(3)} + (a_{01}+a_{12}+a_{23}) y'' + (a_{01}a_{12}+a_{12}a_{23}) y' + a_{01}a_{12}a_{23} y = u",
+      3: "\\text{No leak allowed in the output node.}"
+    };
+
+    const svg = d3.select("svg");
+
+    const nodeGroup = svg.selectAll("g.node")
+      .data(nodes)
+      .enter()
+      .append("g")
+      .attr("class", "node")
+      .attr("transform", (d, i) => `translate(${100 + i * 120}, 75)`)
+      .on("click", (event, d) => {
+        if (d.id === 3) return; // prevent leak on output
+        leakNode = d.id;
+        drawLeak();
+        updateEquation();
+      });
+
+    nodeGroup.append("circle").attr("r", 25);
+    nodeGroup.append("text")
+      .attr("text-anchor", "middle")
+      .attr("dy", 5)
+      .text(d => d.label);
+
+    svg.selectAll("line.link")
+      .data(links)
+      .enter()
+      .append("line")
+      .attr("class", "link")
+      .attr("stroke", "gray")
+      .attr("stroke-width", 2)
+      .attr("x1", d => 100 + d.source * 120)
+      .attr("y1", 75)
+      .attr("x2", d => 100 + d.target * 120)
+      .attr("y2", 75);
+
+    function drawLeak() {
+      svg.selectAll("text.leak-indicator").remove();
+      svg.append("text")
+        .attr("class", "leak-indicator")
+        .attr("x", 100 + leakNode * 120)
+        .attr("y", 40)
+        .text("\u2744"); // Snowflake icon as leak
+    }
+
+    function updateEquation() {
+      const eqDiv = document.getElementById("equation");
+      katex.render(eqLookup[leakNode], eqDiv, { throwOnError: false });
+    }
+
+    drawLeak();
+    updateEquation();
+  </script>
+</body>
+</html>
