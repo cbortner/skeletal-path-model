@@ -98,7 +98,7 @@
       .attr("class", "node")
       .attr("transform", (d, i) => `translate(${100 + i * 120}, 75)`)
       .on("click", (event, d) => {
-        if (d.id === 3) return; // prevent leak on output
+        // allow leak on output node
         leakNode = d.id;
         drawLeak();
         updateEquation();
@@ -205,12 +205,19 @@
         .attr("stroke-width", 2)
         .attr("marker-end", "url(#leak-arrow)");
 
-      svg.append("text")
+      svg.append("foreignObject")
         .attr("class", "leak-label")
-        .attr("x", 100 + leakNode * 120 + 5)
-        .attr("y", 130)
-        .attr("fill", "red")
-        .text("leak");
+        .attr("x", 100 + leakNode * 120 - 20)
+        .attr("y", 135)
+        .attr("width", 50)
+        .attr("height", 30)
+        .append("xhtml:div")
+        .style("color", "red")
+        .style("font-size", "14px")
+        .style("text-align", "center")
+        .each(function() {
+          katex.render(`a_{0${leakNode}}`, this, { throwOnError: false });
+        });
     }
 
     function updateEquation() {
@@ -219,8 +226,8 @@
       const leakTerms = [`a_{0${leakNode}}`];
       let highlighted = rawEq;
       for (const term of leakTerms) {
-        const regex = new RegExp(term.replace(/[{}]/g, m => `\\${m}`), 'g');
-        highlighted = highlighted.replace(regex, `\\textcolor{red}{${term}}`);
+        const regex = new RegExp(term.replace(/[{}]/g, m => `\${m}`), 'g');
+        highlighted = highlighted.replace(regex, `\textcolor{red}{${term}}`);
       }
       katex.render(highlighted, eqDiv, { throwOnError: false });
     }
