@@ -193,7 +193,7 @@
 
     function drawLeak() {
       svg.selectAll("line.leak-indicator").remove();
-      svg.selectAll("text.leak-label").remove();
+      svg.selectAll(".leak-label").remove();
 
       svg.append("line")
         .attr("class", "leak-indicator")
