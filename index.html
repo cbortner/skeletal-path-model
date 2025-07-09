@@ -117,9 +117,9 @@
       .attr("class", "link")
       .attr("stroke", "gray")
       .attr("stroke-width", 2)
-      .attr("x1", d => 100 + d.source * 120)
+      .attr("x1", d => 100 + d.source * 120 + 25)  // edge of source circle
       .attr("y1", 75)
-      .attr("x2", d => 100 + d.target * 120)
+      .attr("x2", d => 100 + d.target * 120 - 25)  // edge of target circle
       .attr("y2", 75)
       .attr("marker-end", "url(#link-arrow)");
 
