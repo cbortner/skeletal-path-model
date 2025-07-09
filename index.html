@@ -58,7 +58,7 @@
     let leakNode = 0; // Initial leak location
 
     const eqLookup = {
-      0: "y^{(4)}_4 + (\textcolor{red}{a_{01}}+a_{21}+a_{32}+a_{43}) y^{(3)}_4 + (a_{01}a_{32}+a_{01}a_{43}+a_{21}a_{32}+a_{21}a_{43}+a_{32}a_{43}) y''_4 + (a_{01}a_{32}a_{43}+a_{21}a_{32}a_{43}) y'_4 = (a_{21}a_{32}a_{43})u_1",
+      0: "y^{(4)}_4 + (a_{01}+a_{21}+a_{32}+a_{43}) y^{(3)}_4 + (a_{01}a_{32}+a_{01}a_{43}+a_{21}a_{32}+a_{21}a_{43}+a_{32}a_{43}) y''_4 + (a_{01}a_{32}a_{43}+a_{21}a_{32}a_{43}) y'_4 = (a_{21}a_{32}a_{43})u_1",
       1: "y^{(4)}_4 + (a_{02}+a_{21}+a_{32}+a_{43}) y^{(3)}_4 + (a_{02}a_{21}+a_{02}a_{43}+a_{21}a_{32}+a_{21}a_{43}+a_{32}a_{43}) y''_4 + (a_{02}a_{21}a_{43}+a_{21}a_{32}a_{43}) y'_4 = (a_{21}a_{32}a_{43})u_1",
       2: "y^{(4)}_4 + (a_{03}+a_{21}+a_{32}+a_{43}) y^{(3)}_4 + (a_{03}a_{21}+a_{03}a_{32}+a_{21}a_{32}+a_{21}a_{43}+a_{32}a_{43}) y''_4 + (a_{03}a_{21}a_{32}+a_{21}a_{32}a_{43}) y'_4 = (a_{21}a_{32}a_{43})u_1",
       3: "y^{(4)}_4 + (a_{04}+a_{21}+a_{32}+a_{43}) y^{(3)}_4 + (a_{04}a_{21}+a_{04}a_{32}+a_{04}a_{43}+a_{21}a_{32}+a_{21}a_{43}+a_{32}a_{43}) y''_4 + (a_{21}a_{32}a_{43}) y'_4 = (a_{21}a_{32}a_{43})u_1",
@@ -227,7 +227,7 @@
       let highlighted = rawEq;
       for (const term of leakTerms) {
         const regex = new RegExp(term.replace(/[{}]/g, m => `\${m}`), 'g');
-        highlighted = highlighted.replace(regex, `\textcolor{red}{${term}}`);
+        highlighted = highlighted.replace(regex, `\\textcolor{red}{${term}}`);
       }
       katex.render(highlighted, eqDiv, { throwOnError: false });
     }
