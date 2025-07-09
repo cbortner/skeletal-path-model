@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Skeletal Path Model</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js">drawLeak();
+    updateEquation();
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" />
   <style>
@@ -100,8 +102,7 @@
       .on("click", (event, d) => {
         // allow leak on output node
         leakNode = d.id;
-        drawLeak();
-        updateEquation();
+        
       });
 
     nodeGroup.append("circle").attr("r", 25);
@@ -210,6 +211,7 @@
     function updateEquation() {
       const eqDiv = document.getElementById("equation");
       katex.render(eqLookup[leakNode], eqDiv, { throwOnError: false });
+    }
     
 
     drawLeak();
