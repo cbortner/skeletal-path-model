@@ -112,9 +112,9 @@
       .attr("class", "node")
       .attr("transform", (d, i) => `translate(${100 + i * 120}, 75)`)
       .on("click", (event, d) => {
-        // allow leak on output node
         leakNode = d.id;
-        
+        drawLeak();
+        updateEquation();
       });
 
     nodeGroup.append("circle").attr("r", 25);
