@@ -127,19 +127,24 @@
     svg.selectAll(".edge-label")
       .data(links)
       .enter()
-      .append("text")
-      .attr("class", "edge-label")
-      .attr("x", d => 100 + (d.source + 0.5) * 120)
-      .attr("y", 60)
-      .attr("text-anchor", "middle")
-      .text(d => d.label);
+      .append("foreignObject")
+      .attr("x", d => 100 + (d.source + 0.5) * 120 - 20)
+      .attr("y", 45)
+      .attr("width", 40)
+      .attr("height", 30)
+      .append("xhtml:div")
+      .style("text-align", "center")
+      .style("font-size", "14px")
+      .each(function(d) {
+        katex.render(d.label, this, { throwOnError: false });
+      });
 
     // Draw input arrow to node 1
     svg.append("line")
-      .attr("x1", 40)
-      .attr("y1", 75)
+      .attr("x1", 50)
+      .attr("y1", 105)
       .attr("x2", 75)
-      .attr("y2", 75)
+      .attr("y2", 80)
       .attr("stroke", "green")
       .attr("stroke-width", 3)
       .attr("marker-end", "url(#arrow)");
@@ -168,20 +173,20 @@
     svg.append("line")
       .attr("x1", 100 + 3 * 120 + 25)
       .attr("y1", 75)
-      .attr("x2", 100 + 3 * 120 + 60)
-      .attr("y2", 75)
+      .attr("x2", 100 + 3 * 120 + 50)
+      .attr("y2", 50)
       .attr("stroke", "purple")
       .attr("stroke-width", 3);
 
     svg.append("circle")
-      .attr("cx", 100 + 3 * 120 + 60)
-      .attr("cy", 75)
+      .attr("cx", 100 + 3 * 120 + 50)
+      .attr("cy", 50)
       .attr("r", 5)
       .attr("fill", "purple");
 
     svg.append("text")
-      .attr("x", 100 + 3 * 120 + 70)
-      .attr("y", 70)
+      .attr("x", 100 + 3 * 120 + 60)
+      .attr("y", 45)
       .attr("text-anchor", "start")
       .attr("fill", "purple")
       .text("out");
