@@ -193,6 +193,8 @@
 
     function drawLeak() {
       svg.selectAll("line.leak-indicator").remove();
+      svg.selectAll("text.leak-label").remove();
+
       svg.append("line")
         .attr("class", "leak-indicator")
         .attr("x1", 100 + leakNode * 120)
@@ -202,11 +204,26 @@
         .attr("stroke", "red")
         .attr("stroke-width", 2)
         .attr("marker-end", "url(#leak-arrow)");
+
+      svg.append("text")
+        .attr("class", "leak-label")
+        .attr("x", 100 + leakNode * 120 + 5)
+        .attr("y", 130)
+        .attr("fill", "red")
+        .text("leak");
     }
 
     function updateEquation() {
       const eqDiv = document.getElementById("equation");
-      katex.render(eqLookup[leakNode], eqDiv, { throwOnError: false });
+      const rawEq = eqLookup[leakNode];
+      const leakTerms = [`a_{0${leakNode}}`];
+      let highlighted = rawEq;
+      for (const term of leakTerms) {
+        const regex = new RegExp(term.replace(/[{}]/g, m => `\${m}`), 'g');
+        highlighted = highlighted.replace(regex, `\textcolor{red}{${term}}`);
+      }
+      katex.render(highlighted, eqDiv, { throwOnError: false });
+    }{${eqLookup[leakNode]}}`, eqDiv, { throwOnError: false });
     }
 
     drawLeak();
