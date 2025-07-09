@@ -219,11 +219,10 @@
       const leakTerms = [`a_{0${leakNode}}`];
       let highlighted = rawEq;
       for (const term of leakTerms) {
-        const regex = new RegExp(term.replace(/[{}]/g, m => `\${m}`), 'g');
-        highlighted = highlighted.replace(regex, `\textcolor{red}{${term}}`);
+        const regex = new RegExp(term.replace(/[{}]/g, m => `\\${m}`), 'g');
+        highlighted = highlighted.replace(regex, `\\textcolor{red}{${term}}`);
       }
       katex.render(highlighted, eqDiv, { throwOnError: false });
-    }{${eqLookup[leakNode]}}`, eqDiv, { throwOnError: false });
     }
 
     drawLeak();
