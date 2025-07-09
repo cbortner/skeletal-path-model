@@ -34,7 +34,7 @@
 <body>
   <h2>Skeletal Path Model</h2>
   <p>Click a node to move the leak.</p>
-  <svg width="600" height="150"></svg>
+  <svg width="600" height="180"></svg>
 
   <div class="eq-box">
     <strong>Input-Output Equation:</strong>
@@ -216,7 +216,7 @@
         .style("font-size", "14px")
         .style("text-align", "center")
         .each(function() {
-          katex.render(`a_{0${leakNode}}`, this, { throwOnError: false });
+          katex.render(`a_{0${leakNode + 1}}`, this, { throwOnError: false });
         });
     }
 
